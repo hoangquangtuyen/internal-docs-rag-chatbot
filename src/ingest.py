@@ -33,6 +33,7 @@ def ingest():
             " "
         ]
     )
+    
     chunks = splitter.split_documents(documents)
     print(f"✂️ Split into {len(chunks)} chunks")
 
