@@ -7,7 +7,7 @@ try:
 except ImportError:
     USE_LAMBDA = False
 
-from src.chat_mock import get_chat_response
+from chat_mock import get_chat_response
 
 app = FastAPI(
     title="Internal Docs RAG Chatbot",
@@ -16,7 +16,7 @@ app = FastAPI(
 )
 
 if USE_LAMBDA:
-    handler = Mangum(app)  # AWS Lambda entrypoint
+    handler = Mangum(app, lifespan="off")
 
 class ChatRequest(BaseModel):
     query: str
