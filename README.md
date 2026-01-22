@@ -2,15 +2,16 @@
 
 A serverless **Retrieval-Augmented Generation (RAG)** chatbot deployed on **AWS Lambda using Docker container images**, designed to answer questions from internal documents efficiently and cost-effectively.
 
-Built with **FastAPI + FAISS**, focusing on clean architecture, serverless deployment, and real-world backend practices.
+Built with **FastAPI + FAISS + LangChain**, focusing on clean architecture, serverless deployment, and real-world backend practices.
 
 ---
 
 ## 🚀 Key Features
 
 - Serverless deployment using **AWS Lambda (Container Image)**
+- Public **REST API** exposed via **Amazon API Gateway**
 - Dockerized **FastAPI** application (Lambda-compatible)
-- Full RAG pipeline: document ingestion → chunking → embeddings → vector search
+- **Full RAG pipeline implemented using LangChain**: document ingestion, text chunking, embedding generation, and FAISS-based vector search
 - **Mock LLM mode** for local testing and cost-free development
 - Simple, maintainable backend structure (no unnecessary complexity)
 
@@ -20,15 +21,25 @@ Built with **FastAPI + FAISS**, focusing on clean architecture, serverless deplo
 
 Client
 ↓
-FastAPI (AWS Lambda)
+Amazon API Gateway
+↓
+FastAPI (AWS Lambda via Mangum)
 ↓
 FAISS Vector Store
 ↓
 LLM (Mock / Local)
 
-- Documents are ingested and indexed into **FAISS**
-- User queries retrieve relevant chunks
-- Context is passed to an **LLM layer** to generate answers
+Flow:
+
+Internal documents are ingested and indexed into FAISS
+
+User requests hit API Gateway and are forwarded to Lambda
+
+FastAPI handles routing and retrieval logic
+
+Relevant document chunks are retrieved
+
+Context is passed to an LLM layer to generate answers
 
 ---
 
@@ -57,9 +68,15 @@ internal-docs-rag-chatbot/
 
 - API Framework: FastAPI
 
+- RAG Framework: LangChain
+
 - Vector Search: FAISS
 
+- API Layer: Amazon API Gateway (REST API)
+
 - Deployment: AWS Lambda, Amazon ECR
+
+- Container Registry: Amazon ECR
 
 - Containerization: Docker
 
@@ -80,38 +97,47 @@ curl -X POST http://localhost:9000/2015-03-31/functions/function/invocations \
 ``` 
 
 ## ☁️ AWS Deployment
-Build Docker image locally
+1. Build Docker image locally
 
-Push image to Amazon ECR
+2. Push image to Amazon ECR
 
-Create AWS Lambda function (Image type)
+3. Create AWS Lambda function (Image type)
 
-Test via Lambda Console or Function URL
+4. Configure Amazon API Gateway to route HTTP requests to Lambda
 
-✅ Successfully deployed and tested on AWS Lambda
+5. Deploy API Gateway stage (/prod)
 
-Deployment is done manually via Docker + AWS CLI
+6. Test endpoints via API Gateway
 
-### 🧪 Development Mode
+## Available Endpoints
+```
+GET  /health
+POST /chat 
+```
+✅ Successfully deployed and tested on AWS Lambda behind API Gateway
+✅ Deployment handled manually via Docker + AWS CLI
+
+## 🧪 Development Mode
 `chat_mock.py` allows running the full RAG flow without calling external LLM APIs
 
 Suitable for:
 
-Local testing
+- Local testing
 
-Demonstration
+- Demonstration
 
-Cost-free development
+- Cost-free development
 
 ## 🎯 What This Project Demonstrates
-Practical RAG system implementation
+- Practical RAG system implementation using LangChain
 
-Real-world Docker → ECR → Lambda workflow
+- Real-world Docker → ECR → Lambda → API Gateway workflow
 
-Understanding of serverless constraints
+- Understanding of serverless constraints
 
-Ability to design systems with cost-awareness and simplicity
+- REST API design and request routing via Amazon API Gateway
 
+- Ability to build cost-aware, production-style backend systems
 ## 👤 Author
 Hoàng Tuyến
 Project built for hands-on learning and job applications.
