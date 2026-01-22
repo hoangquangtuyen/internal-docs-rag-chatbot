@@ -1,109 +1,107 @@
 📚 Internal Docs RAG Chatbot
 
-Một project RAG (Retrieval-Augmented Generation) Chatbot dùng dữ liệu nội bộ (PDF, DOCX, Markdown, TXT, …), có thể chạy local, Docker, và deploy trên AWS Lambda. Project được thiết kế theo hướng modular, dễ mở rộng, và phù hợp để đưa vào CV / Portfolio.
+A production-ready Retrieval-Augmented Generation (RAG) chatbot deployed on AWS Lambda using Docker container images, designed to answer questions from internal documents efficiently and cost-effectively.
 
-🚀 Tính năng chính
+Built with FastAPI + FAISS + HuggingFace Embeddings, following serverless and cloud-native best practices.
 
-🔍 RAG pipeline: ingest tài liệu → embedding → lưu vectorstore → truy vấn + sinh câu trả lời
+🚀 Key Highlights
 
-🤖 2 chế độ chat:
+Serverless-first architecture using AWS Lambda (Container Image)
 
-chat_local.py: dùng LLM thật (Gemini / HuggingFace / …)
+Dockerized FastAPI application, Lambda-compatible
 
-chat_mock.py: mock LLM (không cần API key, phù hợp demo & deploy Lambda)
+RAG pipeline with document ingestion, chunking, embeddings, and vector search
 
-📦 Vectorstore FAISS (offline, nhẹ, nhanh)
+Mock LLM mode for zero-cost development & CI testing
 
-🐳 Docker-ready (chạy local & Lambda container)
+Clean, modular codebase following backend best practices
 
-☁️ AWS Lambda compatible (image-based deployment)
+🧠 System Architecture (High Level)
+Client → FastAPI (Lambda) → Retriever (FAISS) → LLM (Local / Mock)
 
-🔐 Quản lý cấu hình & API key qua .env
 
-🏗️ Kiến trúc tổng quan
-User Query
-   ↓
-Retriever (FAISS)
-   ↓
-Relevant Chunks
-   ↓
-LLM (Local / Mock / API)
-   ↓
-Final Answer
+Documents are ingested and indexed into a FAISS vector store
 
-Mock mode giúp tách biệt business logic và LLM provider, rất phù hợp trong môi trường không có chi phí API.
+Queries retrieve top-K relevant chunks
 
-📂 Cấu trúc thư mục
+Context is passed to an LLM (local or mock) to generate answers
+
+📁 Project Structure
 internal-docs-rag-chatbot/
-│
-├── data/                   # Dữ liệu đầu vào (pdf, docx, md, txt…)
 ├── src/
-│   ├── app.py               # Entry point (FastAPI / Lambda handler)
-│   ├── ingest.py            # Ingest & build vectorstore
-│   ├── chat_local.py        # Chat với LLM thật
-│   ├── chat_mock.py         # Chat mock (không cần API key)
-│   ├── config.py            # Load config & env
-│   └── aws/
-│       ├── dist/            # Build artifacts cho Lambda
-│       └── install/         # Dependencies Lambda
+│   ├── app.py          # FastAPI entry point (Lambda handler via Mangum)
+│   ├── ingest.py       # Document ingestion & vector indexing
+│   ├── chat_local.py   # Local LLM inference
+│   ├── chat_mock.py    # Mock LLM for testing / no-cost mode
+│   ├── config.py       # Environment-based configuration
+│   └── aws/            # AWS-specific helpers
 │
-├── requirements.txt         # Dependencies local
-├── requirements-lambda.txt  # Dependencies cho Lambda
-├── Dockerfile               # Docker & Lambda image
-├── test_fastapi.py          # Test API
-├── response.json            # Sample response
-├── .env.example             # Mẫu biến môi trường
+├── data/               # Source documents
+├── Dockerfile          # Lambda-compatible Docker image
+├── requirements.txt
+├── requirements-lambda.txt
+├── test_fastapi.py     # Basic API tests
 └── README.md
-⚙️ Cài đặt & chạy local
-1️⃣ Tạo virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-2️⃣ Cài dependencies
-pip install -r requirements.txt
-3️⃣ Cấu hình biến môi trường
 
-Tạo file .env:
+⚙️ Tech Stack
 
-LLM_PROVIDER=gemini
-GOOGLE_API_KEY=your_api_key_here
+Backend: FastAPI, Python 3.10+
 
-⚠️ Có thể không cần API key nếu dùng chat_mock.py
+RAG: FAISS, HuggingFace Embeddings
 
-📥 Ingest dữ liệu
-python src/ingest.py
+Deployment: AWS Lambda (Container Image), Amazon ECR
 
-Script sẽ:
+DevOps: Docker, AWS CLI
 
-Load tài liệu trong data/
+Testing: Pytest / FastAPI TestClient
 
-Split text
+🐳 Run Locally with Docker (Lambda Runtime)
+docker build -t rag-chatbot-lambda .
+docker run --rm -p 9000:8080 rag-chatbot-lambda
 
-Tạo embedding
 
-Lưu FAISS vectorstore
+Invoke locally (Lambda-style):
 
-💬 Chạy chatbot
-Mock mode (khuyến nghị để demo / Lambda)
-python src/chat_mock.py
-Local LLM / API mode
-python src/chat_local.py
-🐳 Chạy bằng Docker
-docker build -t rag-chatbot .
-docker run -p 8000:8000 rag-chatbot
+curl -X POST http://localhost:9000/2015-03-31/functions/function/invocations \
+  -H "Content-Type: application/json" \
+  -d '{"httpMethod":"GET","path":"/health"}'
 
-Test:
+☁️ AWS Deployment (Summary)
 
-http://localhost:8000/docs
-☁️ Deploy AWS Lambda (Container Image)
+Build Lambda-compatible Docker image
 
-Base image: public.ecr.aws/lambda/python
+Push image to Amazon ECR
 
-Entry point: src/app.py
+Create AWS Lambda function (Image type)
 
-Không phụ thuộc API key khi dùng mock mode
+Optional: expose via Lambda Function URL
 
-👉 Phù hợp cho free-tier / demo / interview project
+✔ Successfully deployed and tested on AWS Lambda.
 
-👤 Tác giả
+🧪 Development Mode
+
+chat_mock.py allows running the full RAG flow without calling external LLM APIs
+
+Ideal for:
+
+CI/CD
+
+Cost-free demos
+
+Local testing
+
+🎯 Why This Project Matters
+
+This project demonstrates:
+
+Real-world RAG system design
+
+Practical serverless & Docker deployment
+
+Awareness of cost optimization (Mock LLM)
+
+Clean separation between ingestion, retrieval, and generation
+
+👤 Author
+
 Hoàng Tuyến
