@@ -1,107 +1,117 @@
-📚 Internal Docs RAG Chatbot
+# 📚 Internal Docs RAG Chatbot
 
-A production-ready Retrieval-Augmented Generation (RAG) chatbot deployed on AWS Lambda using Docker container images, designed to answer questions from internal documents efficiently and cost-effectively.
+A serverless Retrieval-Augmented Generation (RAG) chatbot deployed on AWS Lambda using Docker container images, designed to answer questions from internal documents efficiently and cost-effectively.
 
-Built with FastAPI + FAISS + HuggingFace Embeddings, following serverless and cloud-native best practices.
+Built with FastAPI + FAISS, focusing on clean architecture, serverless deployment, and real-world backend practices.
 
-🚀 Key Highlights
+### 🚀 Key Features
 
-Serverless-first architecture using AWS Lambda (Container Image)
+Serverless deployment using AWS Lambda (Container Image)
 
-Dockerized FastAPI application, Lambda-compatible
+Dockerized FastAPI application (Lambda-compatible)
 
-RAG pipeline with document ingestion, chunking, embeddings, and vector search
+RAG pipeline: document ingestion → chunking → embeddings → vector search
 
-Mock LLM mode for zero-cost development & CI testing
+Mock LLM mode for local testing and cost-free development
 
-Clean, modular codebase following backend best practices
+Simple, maintainable backend structure (no unnecessary complexity)
 
-🧠 System Architecture (High Level)
-Client → FastAPI (Lambda) → Retriever (FAISS) → LLM (Local / Mock)
+### 🧠 Architecture Overview
 
+Client
+  ↓
+FastAPI (AWS Lambda)
+  ↓
+FAISS Vector Store
+  ↓
+LLM (Mock / Local)
 
-Documents are ingested and indexed into a FAISS vector store
++ Documents are ingested and indexed into FAISS
 
-Queries retrieve top-K relevant chunks
++ User queries retrieve relevant chunks
 
-Context is passed to an LLM (local or mock) to generate answers
++ Context is passed to an LLM layer to generate answers
 
-📁 Project Structure
-internal-docs-rag-chatbot/
+### 📁 Project Structure
+
+##### internal-docs-rag-chatbot/
 ├── src/
-│   ├── app.py          # FastAPI entry point (Lambda handler via Mangum)
-│   ├── ingest.py       # Document ingestion & vector indexing
-│   ├── chat_local.py   # Local LLM inference
-│   ├── chat_mock.py    # Mock LLM for testing / no-cost mode
-│   ├── config.py       # Environment-based configuration
+│   ├── app.py          # FastAPI entry point (Mangum Lambda handler)
+│   ├── ingest.py       # Document ingestion & indexing
+│   ├── chat_local.py   # Local LLM logic
+│   ├── chat_mock.py    # Mock LLM (no API cost)
+│   ├── config.py       # Environment configuration
 │   └── aws/            # AWS-specific helpers
 │
-├── data/               # Source documents
+├── data/               # Internal documents
 ├── Dockerfile          # Lambda-compatible Docker image
 ├── requirements.txt
 ├── requirements-lambda.txt
-├── test_fastapi.py     # Basic API tests
+├── test_fastapi.py     # API testing
 └── README.md
 
-⚙️ Tech Stack
+### ⚙️ Tech Stack
 
-Backend: FastAPI, Python 3.10+
++Language: Python 3.10+
 
-RAG: FAISS, HuggingFace Embeddings
++ API Framework: FastAPI
 
-Deployment: AWS Lambda (Container Image), Amazon ECR
++ Vector Search: FAISS
 
-DevOps: Docker, AWS CLI
++ Deployment: AWS Lambda, Amazon ECR
 
-Testing: Pytest / FastAPI TestClient
++ Containerization: Docker
 
-🐳 Run Locally with Docker (Lambda Runtime)
-docker build -t rag-chatbot-lambda .
-docker run --rm -p 9000:8080 rag-chatbot-lambda
+### 🐳 Run Locally (Lambda Runtime)
 
+> docker build -t rag-chatbot-lambda .
+> docker run --rm -p 9000:8080 rag-chatbot-lambda
 
-Invoke locally (Lambda-style):
+##### Test Lambda locally:
 
-curl -X POST http://localhost:9000/2015-03-31/functions/function/invocations \
+> curl -X POST http://localhost:9000/2015-03-31/functions/function/invocations \
   -H "Content-Type: application/json" \
   -d '{"httpMethod":"GET","path":"/health"}'
 
-☁️ AWS Deployment (Summary)
 
-Build Lambda-compatible Docker image
+### ☁️ AWS Deployment
+
+Build Docker image locally
 
 Push image to Amazon ECR
 
 Create AWS Lambda function (Image type)
 
-Optional: expose via Lambda Function URL
+Test via Lambda console / Function URL
 
 ✔ Successfully deployed and tested on AWS Lambda.
 
-🧪 Development Mode
+Deployment is done manually via Docker + AWS CLI
 
-chat_mock.py allows running the full RAG flow without calling external LLM APIs
 
-Ideal for:
+### 🧪 Development Mode
 
-CI/CD
+chat_mock.py allows running the full flow without calling external LLM APIs
 
-Cost-free demos
+Suitable for:
 
 Local testing
 
-🎯 Why This Project Matters
+Demonstration
 
-This project demonstrates:
+Cost-free development
 
-Real-world RAG system design
+### 🎯 What This Project Demonstrates
 
-Practical serverless & Docker deployment
+Practical RAG system implementation
 
-Awareness of cost optimization (Mock LLM)
+Real-world Docker → ECR → Lambda workflow
 
-Clean separation between ingestion, retrieval, and generation
+Understanding of serverless constraints
 
-👤 Author
+Ability to design systems with cost-awareness and simplicity
 
-Hoàng Tuyến
+##### 👤 Author
+
+###### Hoàng Tuyến
+(Project built for hands-on learning and job applications.)
